@@ -16,11 +16,9 @@ def perform_query():
         result = engine.execute()
     except Exception:
         abort(400, "Cant parse request")
-        
-    return {
-            "status": 'ok',
-            "result": result
-            }
+
+    return {"status": 'ok', "result": result}
+
 
 if __name__ == '__main__':
     app.run()

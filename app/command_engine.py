@@ -1,30 +1,30 @@
 from dataclasses import dataclass
-from utils import read_file, filter_query, map_query, sort_query, limit_query, unique_query
+from helpers import read_file_generator, filter_query, map_query, sort_query, limit_query, unique_query
+
 
 @dataclass(slots=False)
 class Command:
     name: str
     value: str
 
+
 class CommandEnginge:
     def __init__(self, params: dict[str, str]):
         params_value = params.get('queries')
         if params_value is None:
             raise Exception("Can't parse params!")
-        
+
         self._params = params_value
         self.commands = []
 
         result = self._prepeare_commands()
-        if result == False:
+        if not result:
             raise Exception("Can't parse params!")
 
     # Public
-    
     def execute(self):
-        data = read_file(f'data/{self.filename}')
-        if len(data) == 0:
-            return
+        data = read_file_generator(f'data/{self.filename}')
+
         for item in self.commands:
             if item.name == 'filter':
                 data = filter_query(item.value, data)
@@ -39,7 +39,7 @@ class CommandEnginge:
         return data
 
     # Private
-    
+
     def _prepeare_commands(self) -> bool:
         self.filename = self._params.get('file_name')
 
@@ -52,17 +52,10 @@ class CommandEnginge:
         cmd2 = self._params.get('cmd2')
         value2 = self._params.get('value2')
 
-        if None not in [cmd1, value1]:
+        if cmd1 and value1:
             self.commands.append(Command(cmd1, value1))
 
-        if None not in [cmd2, value2]:
+        if cmd2 and value2:
             self.commands.append(Command(cmd2, value2))
 
         return len(self.commands) > 0
-
-try:
-    a = CommandEnginge({"Test": True})
-except Exception as e:
-    print(str(e))
-
-print("done")
